@@ -1,0 +1,20 @@
+{
+  "name": "Pulse Player",
+  "short_name": "Pulse",
+  "description": "Free offline music and video player with equalizer, lyrics, sleep timer, ringtone maker and video-to-MP3 converter.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f0f15",
+  "theme_color": "#12121a",
+  "categories": ["music", "entertainment"],
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "file_handlers": [
+    { "action": "./", "accept": { "audio/*": [".mp3", ".flac", ".wav", ".m4a", ".aac", ".ogg", ".opus", ".mid", ".midi"], "video/*": [".mp4", ".mkv", ".webm", ".3gp", ".mov"] } }
+  ]
+}

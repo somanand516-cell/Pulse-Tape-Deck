@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3a3a3e">
+<meta name="description" content="Free offline cassette-deck style music and video player with equalizer, tape mode, lyrics, sleep timer, ringtone maker and video-to-MP3 converter.">
+<title>Pulse Tape Deck</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&family=Caveat:wght@600&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <!-- ============ SIDEBAR / NAV ============ -->
+  <nav id="nav">
+    <div class="brand"><img src="icons/icon.svg" alt=""><span>Pulse<small>tape deck</small></span></div>
+    <button class="nav-item active" data-view="songs"><i class="ic">⌂</i><span>Home</span></button>
+    <button class="nav-item" data-view="videos"><i class="ic">▶</i><span>Videos</span></button>
+    <button class="nav-item" data-view="artists"><i class="ic">☺</i><span>Artists</span></button>
+    <button class="nav-item" data-view="albums"><i class="ic">◉</i><span>Albums</span></button>
+    <button class="nav-item" data-view="genres"><i class="ic">♯</i><span>Genres</span></button>
+    <button class="nav-item" data-view="folders"><i class="ic">▤</i><span>Folders</span></button>
+    <button class="nav-item" data-view="playlists"><i class="ic">⫼</i><span>Collections</span></button>
+    <button class="nav-item" data-view="tools"><i class="ic">✦</i><span>Tools</span></button>
+  </nav>
+
+  <!-- ============ MAIN ============ -->
+  <main id="main">
+    <header id="topbar">
+      <button class="icon-btn mobile-only" id="btnMenu" title="Menu">☰</button>
+      <h1 id="viewTitle">Home</h1>
+      <div class="search-wrap">
+        <input id="search" type="search" placeholder="Search songs, artists, albums…" autocomplete="off">
+      </div>
+      <button class="icon-btn" id="btnAdd" title="Add music &amp; videos">＋</button>
+      <button class="icon-btn" id="btnTheme" title="Graphite / aluminum theme">◐</button>
+      <button class="icon-btn" id="btnSettings" title="Settings">⚙</button>
+    </header>
+
+    <div id="toolbar"></div>
+    <section id="content"></section>
+  </main>
+
+  <!-- ============ MINI PLAYER BAR ============ -->
+  <footer id="bar" class="hidden">
+    <div class="bar-progress"><div id="barProgress"></div></div>
+    <div class="bar-track" id="barOpen">
+      <div class="art sm" id="barArt"></div>
+      <div class="meta">
+        <div class="t"><span id="barTitle">—</span><span class="a" id="barArtist"></span></div>
+      </div>
+    </div>
+    <div class="bar-controls">
+      <button class="icon-btn desk-only" data-act="prev" title="Previous">⏮</button>
+      <button class="icon-btn play" data-act="toggle" title="Play / pause">▶</button>
+      <button class="icon-btn desk-only" data-act="next" title="Next">⏭</button>
+    </div>
+    <div class="bar-extra desk-only">
+      <span class="time" id="barTime">0:00 / 0:00</span>
+      <button class="icon-btn" data-act="lyrics" title="Lyrics">❝</button>
+      <button class="icon-btn" data-act="queue" title="Queue">☷</button>
+      <button class="icon-btn" data-act="eq" title="Equalizer">⚌</button>
+      <button class="icon-btn" data-act="float" title="Floating window">⧉</button>
+      <input type="range" id="barVol" min="0" max="1" step="0.01" value="1" title="Volume">
+    </div>
+  </footer>
+
+  <!-- ============ MOBILE TAB BAR ============ -->
+  <nav id="tabbar">
+    <button data-tab="songs" class="active"><i>⌂</i>Home</button>
+    <button data-tab="search"><i>⌕</i>Search</button>
+    <button data-tab="playlists"><i>⫼</i>Collections</button>
+    <button data-tab="tools"><i>✦</i>Tools</button>
+  </nav>
+
+  <!-- ============ NOW PLAYING (TAPE DECK) ============ -->
+  <section id="np" class="hidden" aria-label="Now playing">
+    <header class="np-head">
+      <button class="icon-btn" id="npClose" title="Back">‹</button>
+      <div class="np-tabs">
+        <button class="tab active" data-np="art">Deck</button>
+        <button class="tab" data-np="lyrics">Lyrics</button>
+        <button class="tab" data-np="queue">Queue</button>
+      </div>
+      <button class="icon-btn" id="npMore" title="More">⋮</button>
+    </header>
+    <div class="np-body">
+      <div class="np-pane active" data-pane="art">
+        <div class="stage" id="stage">
+          <div class="deck" id="deck">
+            <div class="deck-window">
+              <div class="deck-cassette" id="deckCassette"></div>
+              <div class="glass"></div>
+            </div>
+          </div>
+          <div id="videoSlot"></div>
+        </div>
+        <div class="deck-plate">
+          <div class="vu" id="vuL"></div>
+          <div class="plate-mid">
+            <div class="counter" id="counter" title="Tape counter — tap to reset"></div>
+            <button class="led-btn" id="btnTape" title="Tape mode: saturation, wow &amp; flutter, hiss"><span class="led"></span>TAPE</button>
+            <span class="side-badge" id="sideBadge">SIDE A</span>
+          </div>
+          <div class="vu" id="vuR"></div>
+        </div>
+      </div>
+      <div class="np-pane" data-pane="lyrics">
+        <div class="lyrics-tools">
+          <button class="chip" id="lyrLoad">Load .lrc</button>
+          <button class="chip" id="lyrOnline">Search online</button>
+          <button class="chip" id="lyrMinus" title="Lyrics earlier">−0.5s</button>
+          <button class="chip" id="lyrPlus" title="Lyrics later">+0.5s</button>
+          <span class="muted" id="lyrOffset"></span>
+        </div>
+        <div class="lyrics" id="lyrics"></div>
+      </div>
+      <div class="np-pane" data-pane="queue">
+        <div class="queue-head"><span id="queueInfo"></span><button class="chip" id="queueClear">Clear upcoming</button></div>
+        <ol class="list" id="queueList"></ol>
+      </div>
+    </div>
+
+    <div class="transport">
+      <button class="icon-btn" id="btnShuffle" title="Shuffle">⤮</button>
+      <div class="keys">
+        <div class="key-wrap"><span class="key-label">⏮</span><button class="key" id="keyPrev" data-act="prev" title="Previous (hold to rewind)"></button></div>
+        <div class="key-wrap"><span class="key-label" id="playLabel">▶</span><button class="key wide" id="keyPlay" data-act="toggle" title="Play / pause"></button></div>
+        <div class="key-wrap"><span class="key-label">⏭</span><button class="key" id="keyNext" data-act="next" title="Next (hold to fast-forward)"></button></div>
+      </div>
+      <button class="icon-btn" id="btnRepeat" title="Repeat">↻</button>
+    </div>
+    <div class="np-info">
+      <div class="t" id="npTitle">—</div>
+      <div class="a" id="npArtist"></div>
+    </div>
+    <div class="dial-wrap">
+      <div class="dial">
+        <div class="dial-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div>
+        <div class="dial-ticks"></div>
+        <div class="dial-track"><div id="dialFill"></div></div>
+        <div class="dial-needle" id="dialNeedle"></div>
+        <input type="range" id="seek" min="0" max="1000" value="0" step="1" aria-label="Seek">
+      </div>
+      <div class="dial-times"><span id="npCur">0:00</span><span id="npDur">0:00</span></div>
+    </div>
+    <div class="np-actions">
+      <button class="icon-btn fav" id="npFav" title="Favorite">♡</button>
+      <span class="spacer"></span>
+      <button class="icon-btn" data-act="eq" title="Equalizer">⚌</button>
+      <button class="icon-btn" data-act="sleep" title="Sleep timer">☾<small id="sleepBadge"></small></button>
+      <button class="icon-btn" data-act="speed" title="Playback speed"><small id="speedLabel">1x</small></button>
+      <button class="icon-btn" data-act="float" title="Floating window">⧉</button>
+      <button class="icon-btn" data-act="pip" title="Picture in picture (video)">▣</button>
+      <button class="icon-btn" data-act="fullscreen" title="Full screen video">⛶</button>
+      <span class="spacer"></span>
+      <button class="icon-btn" data-act="queue" title="Queue">☰</button>
+    </div>
+  </section>
+
+  <!-- ============ FLOATING WINDOW ============ -->
+  <div id="floater" class="hidden">
+    <div class="fl-head" id="flHead">
+      <span class="fl-title" id="flTitle">—</span>
+      <button class="icon-btn sm" id="flExpand" title="Open player">⤢</button>
+      <button class="icon-btn sm" id="flClose" title="Close">✕</button>
+    </div>
+    <div class="fl-stage" id="flStage"><div class="fl-cassette" id="flArt"></div></div>
+    <div class="fl-seek"><input type="range" id="flSeek" min="0" max="1000" value="0"></div>
+    <div class="fl-controls">
+      <button class="icon-btn sm" data-act="prev">⏮</button>
+      <button class="icon-btn sm play" data-act="toggle">▶</button>
+      <button class="icon-btn sm" data-act="next">⏭</button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <div id="modalRoot"></div>
+  <div id="dropHint" class="hidden">Drop music or video files to load them into the deck</div>
+</div>
+
+<!-- the single media element used for all playback (audio + video) -->
+<video id="media" playsinline preload="auto" crossorigin="anonymous"></video>
+
+<input type="file" id="fileInput" multiple hidden accept="audio/*,video/*,.mp3,.flac,.wav,.m4a,.aac,.ogg,.opus,.mid,.midi,.mkv,.webm,.3gp,.mov,.mp4,.lrc">
+<input type="file" id="folderInput" webkitdirectory multiple hidden>
+<input type="file" id="lrcInput" accept=".lrc,.txt" hidden>
+
+<script src="js/db.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/metadata.js"></script>
+<script src="js/midi.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/lyrics.js"></script>
+<script src="js/deck.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
